@@ -1,0 +1,66 @@
+{
+  "name": "Weekly Ops Digest (Monday 07:00 Nairobi)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 7 * * 1" }] },
+        "options": {}
+      },
+      "id": "node-schedule",
+      "name": "Monday 07:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-260, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://appointiq.vercel.app/api/dashboard",
+        "method": "GET",
+        "options": {}
+      },
+      "id": "node-dashboard",
+      "name": "Vercel: fetch dashboard aggregates",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [0, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $json;\nconst lines = [\n  `Mercy Medical Centre — weekly ops digest`,\n  `Leads: ${d.counts.contacts} | New: ${d.counts.newLeads} | Booked: ${d.counts.booked}`,\n  `Visits: ${d.counts.visited} | No-shows: ${d.counts.noShows} | Follow-ups due: ${d.counts.followupsDue}`,\n  `Appointments today: ${d.counts.appointmentsToday} | Est. revenue: KES ${d.counts.potentialRevenue.toLocaleString()}`,\n  ``,\n  `Pipeline: ${d.pipeline.map(p => `${p.stage}:${p.count}`).join('  ')}`,\n  `Top sources: ${d.sources.slice(0,3).map(s => `${s.source}:${s.count}`).join('  ')}`,\n  `Automation runs this week: ${d.runs.length}`,\n];\nreturn [{ json: { digest: lines.join('\\n') } }];",
+        "options": {}
+      },
+      "id": "node-format",
+      "name": "Format digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [280, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"text\": \"={{ $json.digest }}\"\n}",
+        "options": {}
+      },
+      "id": "node-slack",
+      "name": "Slack / email webhook (replace URL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [560, 200]
+    }
+  ],
+  "connections": {
+    "Monday 07:00": {
+      "main": [[{ "node": "Vercel: fetch dashboard aggregates", "type": "main", "index": 0 }]]
+    },
+    "Vercel: fetch dashboard aggregates": {
+      "main": [[{ "node": "Format digest", "type": "main", "index": 0 }]]
+    },
+    "Format digest": {
+      "main": [[{ "node": "Slack / email webhook (replace URL)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

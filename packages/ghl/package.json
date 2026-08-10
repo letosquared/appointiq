@@ -1,0 +1,17 @@
+{
+  "name": "@appointiq/ghl",
+  "version": "0.1.0",
+  "description": "Typed GoHighLevel v2 SDK with swappable transports (live API or GHL-compatible sandbox).",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.9"
+  }
+}

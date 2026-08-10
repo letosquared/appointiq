@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Coral — Mercy Medical primary (site CTA #ed5463, hover #e04b5b) */
+  --color-clinic-50: #fef5f6;
+  --color-clinic-100: #fde7e9;
+  --color-clinic-200: #fccfd3;
+  --color-clinic-300: #f8a9af;
+  --color-clinic-400: #f27b85;
+  --color-clinic-500: #ed5463;
+  --color-clinic-600: #e04b5b;
+  --color-clinic-700: #c63d4d;
+  --color-clinic-800: #a33342;
+  --color-clinic-900: #872f3c;
+  --color-clinic-950: #4a151d;
+
+  /* Deep teal — Mercy headings/brand (#224859) */
+  --color-ink-50: #eef6f8;
+  --color-ink-100: #d5e8ec;
+  --color-ink-200: #afd1d9;
+  --color-ink-300: #7fb2bf;
+  --color-ink-400: #4a8ea0;
+  --color-ink-500: #2f7185;
+  --color-ink-600: #245a6d;
+  --color-ink-700: #224859;
+  --color-ink-800: #1e3c4a;
+  --color-ink-900: #162b36;
+  --color-ink-950: #0d1a21;
+
+  --font-sans: 'Rubik', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-poppins: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: #ffffff;
+  color: #7d7d7d;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings use Poppins in the deep teal, exactly like mercymedicalcentre.co.ke. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins);
+  color: var(--color-ink-700);
+}
+
+/* Thin scrollbars for feed panels */
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}

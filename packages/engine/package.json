@@ -1,0 +1,20 @@
+{
+  "name": "@appointiq/engine",
+  "version": "0.1.0",
+  "description": "The AppointIQ decision engine: deterministic lead scoring, reply drafting and routing. The no-API-key 'AI qualifier' that n8n calls over HTTP.",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@appointiq/ghl": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.9"
+  }
+}
