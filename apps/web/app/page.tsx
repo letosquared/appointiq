@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getDashboardData } from '@/lib/data';
-import { Badge, BrandWordmark, Logo } from '@/components/ui';
+import { Badge, BrandWordmark, Logo, TierBadge } from '@/components/ui';
 import { QualifierDemo } from '@/components/landing/QualifierDemo';
 
 export const dynamic = 'force-dynamic';
@@ -157,17 +157,19 @@ export default async function LandingPage() {
         <p className="mt-1 text-sm text-slate-500">The most recent decisions the pipeline made.</p>
         <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
           {recentRuns.length === 0 ? (
-            <p className="p-6 text-sm text-slate-500">No runs yet — open the dashboard and hit “Simulate inbound lead”.</p>
+            <p className="p-6 text-sm text-slate-500">No runs yet — try the qualifier above, or simulate an inbound lead from the ops dashboard.</p>
           ) : (
             <ul className="divide-y divide-slate-100">
               {recentRuns.map((r) => (
-                <li key={r.id} className="flex items-center justify-between px-5 py-3 text-sm">
-                  <div className="flex items-center gap-3">
+                <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <span className="font-medium text-slate-800">{r.contactName}</span>
                     <Badge tone={r.type === 'booked' ? 'green' : 'blue'}>{r.type}</Badge>
-                    <span className="text-slate-500">{r.message}</span>
+                    {r.score !== undefined && <TierBadge tier={r.tier} />}
+                    {r.score !== undefined && <Badge tone="green">score {r.score}</Badge>}
+                    <span className="truncate text-slate-500">{r.message}</span>
                   </div>
-                  <span className="text-xs text-slate-400">{new Date(r.createdAt).toLocaleString()}</span>
+                  <span className="shrink-0 text-xs text-slate-400">{new Date(r.createdAt).toLocaleString()}</span>
                 </li>
               ))}
             </ul>

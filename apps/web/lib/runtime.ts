@@ -1,4 +1,5 @@
 import type { WebhookEventType } from '@appointiq/ghl';
+import { ensureDemoActivity } from './demo-activity';
 import { getGhlClient, getSandboxServer, getSandboxStore } from './ghl';
 
 let runtimePromise: Promise<void> | undefined;
@@ -20,6 +21,9 @@ async function bootstrap(): Promise<void> {
 
   // Trigger seeding now (idempotent).
   await server.handle({ method: 'GET', path: '/contacts', query: {}, headers: {} });
+
+  // Backfill sample runs/outbox so the demo never opens to empty panels.
+  await ensureDemoActivity();
 
   const publicUrl = process.env.PUBLIC_BASE_URL;
   if (!publicUrl) return;
@@ -54,4 +58,5 @@ export async function resetDemo(): Promise<void> {
   const store = getSandboxStore();
   await store.putCollection('runs', []);
   await store.putCollection('outbox', []);
+  await ensureDemoActivity();
 }

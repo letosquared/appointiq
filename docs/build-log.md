@@ -84,3 +84,14 @@ Every capability worth telling the Conek team about, in order.
   windows, replies).
 - `packages/sandbox`: GHL-contract tests (contacts, slots, appointments, tags).
 - `apps/web`: typecheck via `tsc --noEmit`; production build green. Total: 33.
+
+## 14. Demo backfill (Loom readiness)
+- `apps/web/lib/demo-activity.ts` seeds realistic sample `runs` and outbox
+  messages when the store is empty — the landing "Automation, live" feed, the
+  dashboard Automation tab and the Outbox (1 queued + 2 sent) never open to
+  empty panels, even on a fresh Vercel deploy.
+- Runs are written newest-first with real engine-shaped `score` / `tier` /
+  `reasons` and reference seed contacts/appointments. Seeding only runs when
+  empty and is sandbox-only, so real simulations always win; "Reset demo"
+  wipes smoke-test cruft and re-seeds the sample activity.
+- Landing feed rows now show `TierBadge` + score.
