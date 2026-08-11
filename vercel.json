@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "rootDirectory": "apps/web",
   "buildCommand": "npm run build",
   "crons": [
     { "path": "/api/cron/followups", "schedule": "0 */6 * * *" }

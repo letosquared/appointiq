@@ -11,9 +11,11 @@ The app deploys with zero environment variables — `GHL_MODE` defaults to
 visitor sees the seeded Mercy clinic and can run the landing-page qualifier.
 
 1. **Import the repo** at [vercel.com/new](https://vercel.com/new) →
-   `appointiq`. The repo-root `vercel.json` pins the Next.js preset and
-   `rootDirectory: apps/web`, so no manual settings are needed. If the preview
-   shows a **Root Directory**, select `apps/web`.
+   `appointiq`. Pick the **Next.js** framework preset, and set **Root Directory**
+   to `apps/web` (the app lives in a monorepo). The repo-root `vercel.json`
+   declares the framework + build command + cron; `rootDirectory` is NOT a
+   `vercel.json` field — Vercel rejects it — it lives in **Project Settings →
+   General → Root Directory**.
 2. **No env vars required** to start. Recommended before sharing the link:
    - `PUBLIC_BASE_URL` = `https://<your-project>.vercel.app` (enables the app's
      own webhook receiver so automation events fire and show in the dashboard).
