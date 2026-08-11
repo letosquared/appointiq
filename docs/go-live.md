@@ -24,8 +24,10 @@ visitor sees the seeded Mercy clinic and can run the landing-page qualifier.
    For a persistent multi-visitor demo, add Upstash from the Vercel Marketplace
    (free tier) — it sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` automatically;
    set `SANDBOX_STORE=upstash`. No code changes.
-4. **Cron.** `vercel.json` already declares `0 */6 * * *` →
-   `/api/cron/followups`; enable the "Cron" feature in project Settings.
+4. **Cron.** `vercel.json` declares `0 6 * * *` → `/api/cron/followups` (once
+   daily at 06:00 UTC — the Hobby plan only allows cron jobs that run once per
+   day; running more often fails the deploy). Enable the "Cron" feature in
+   project Settings.
 5. **Verify** after deploy: open `/`, click a scenario in *Try the qualifier*,
    then open `/dashboard` → *Outbox* → *Approve & send*.
 
