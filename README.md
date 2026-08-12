@@ -24,7 +24,7 @@ Clinics lose money three ways: after-hours leads go cold, no-shows leave empty c
 | Booking intent detected | Next free slot is auto-booked on the right doctor's calendar |
 | Reply drafted | Service-specific WhatsApp/SMS copy queued to an outbox for staff approval |
 | Patient no-shows | n8n calls `/api/automations/rebook` → next free slot + "sorry we missed you" WhatsApp |
-| Leads go quiet | `/api/cron/followups` (Vercel Cron) or n8n sends nurture reminders per `cf_followup_due` |
+| Leads go quiet | n8n (scheduled) hits `/api/cron/followups` to send nurture reminders per `cf_followup_due`. Vercel Cron was dropped from `vercel.json` — Hobby plan only runs once/day, so scheduling lives in n8n instead. |
 
 ## The stack — and how each tool is used
 

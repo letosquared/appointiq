@@ -73,19 +73,48 @@ export function OverviewTab({ data }: { data: DashboardData }) {
         ) : (
           <ul className="divide-y divide-slate-100">
             {data.runs.slice(0, 6).map((r) => (
-              <li key={r.id} className="flex items-center justify-between gap-4 py-2.5">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="font-medium text-slate-800">{r.contactName}</span>
-                  <Badge tone={r.type === 'booked' ? 'green' : 'blue'}>{r.type}</Badge>
-                  {r.score !== undefined && <TierBadge tier={r.tier} />}
-                  <span className="truncate text-xs text-slate-500">{r.message}</span>
+              <li key={r.id} className="py-2.5">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="font-medium text-slate-800">{r.contactName}</span>
+                    <Badge tone={r.type === 'booked' ? 'green' : 'blue'}>{r.type}</Badge>
+                    {r.score !== undefined && <TierBadge tier={r.tier} />}
+                    <span className="truncate text-xs text-slate-500">{r.message}</span>
+                  </div>
+                  <span className="shrink-0 text-xs text-slate-400">{fmtTime(r.createdAt)}</span>
                 </div>
-                <span className="shrink-0 text-xs text-slate-400">{fmtTime(r.createdAt)}</span>
+                <RunDetails run={r} />
               </li>
             ))}
           </ul>
         )}
       </Panel>
+    </div>
+  );
+}
+
+function RunDetails({ run }: { run: DashboardData['runs'][number] }) {
+  if (!run.reasons?.length && !run.reply) return null;
+  return (
+    <div className="mt-2 space-y-1.5">
+      {run.reasons && run.reasons.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Why</span>
+          {run.reasons.map((reason, i) => (
+            <span key={i} className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
+              {reason}
+            </span>
+          ))}
+        </div>
+      )}
+      {run.reply && (
+        <div className="flex items-start gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2">
+          <Badge tone={run.reply.channel === 'whatsapp' ? 'green' : run.reply.channel === 'email' ? 'blue' : 'amber'}>
+            {run.reply.channel}
+          </Badge>
+          <p className="text-xs leading-relaxed text-slate-600">{run.reply.body}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -190,6 +219,7 @@ export function AutomationTab({ data }: { data: DashboardData }) {
                 <span className="ml-auto text-xs text-slate-400">{fmtTime(r.createdAt)}</span>
               </div>
               {r.message && <p className="mt-2 text-sm text-slate-600">{r.message}</p>}
+              <RunDetails run={r} />
             </li>
           ))}
         </ul>
@@ -201,8 +231,24 @@ export function AutomationTab({ data }: { data: DashboardData }) {
 export function OutboxTab({ data }: { data: DashboardData }) {
   const router = useRouter();
   const [sending, setSending] = useState(false);
+  const [sendingId, setSendingId] = useState<string | null>(null);
   const chanTone = (c: string) => (c === 'whatsapp' ? 'green' : c === 'email' ? 'blue' : 'amber');
   const queued = data.outbox.filter((m) => m.status === 'queued').length;
+  const failed = data.outbox.filter((m) => m.status === 'failed').length;
+
+  const sendOne = async (id: string) => {
+    setSendingId(id);
+    try {
+      await fetch('/api/outbox/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [id] }),
+      });
+      router.refresh();
+    } finally {
+      setSendingId(null);
+    }
+  };
 
   const approveAll = async () => {
     setSending(true);
@@ -216,7 +262,7 @@ export function OutboxTab({ data }: { data: DashboardData }) {
 
   return (
     <Panel
-      title={`Outbox — AI drafts, staff approve, WhatsApp sends (${queued} awaiting approval)`}
+      title={`Outbox — AI drafts, staff approve, WhatsApp sends (${queued} awaiting approval${failed ? `, ${failed} failed` : ''})`}
       right={
         queued > 0 ? (
           <button
@@ -224,7 +270,7 @@ export function OutboxTab({ data }: { data: DashboardData }) {
             disabled={sending}
             className="rounded-lg bg-clinic-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-clinic-700 disabled:opacity-60"
           >
-            {sending ? 'Sending…' : 'Approve & send'}
+            {sending ? 'Sending…' : 'Approve all'}
           </button>
         ) : (
           <Badge tone="green">{data.outbox.length} messages</Badge>
@@ -242,7 +288,18 @@ export function OutboxTab({ data }: { data: DashboardData }) {
                 <span className="font-medium text-slate-800">{m.name}</span>
                 <span className="text-xs text-slate-500">{m.to}</span>
                 <Badge tone={m.status === 'sent' ? 'green' : m.status === 'failed' ? 'red' : 'amber'}>{m.status}</Badge>
-                <span className="ml-auto text-xs text-slate-400">{fmtTime(m.createdAt)}</span>
+                <span className="ml-auto flex items-center gap-2">
+                  {(m.status === 'queued' || m.status === 'failed') && (
+                    <button
+                      onClick={() => void sendOne(m.id)}
+                      disabled={sendingId === m.id}
+                      className="rounded-md border border-clinic-300 bg-clinic-50 px-2 py-1 text-xs font-semibold text-clinic-700 hover:bg-clinic-100 disabled:opacity-50"
+                    >
+                      {sendingId === m.id ? 'Sending…' : m.status === 'failed' ? 'Retry & send' : 'Approve & send'}
+                    </button>
+                  )}
+                  <span className="text-xs text-slate-400">{fmtTime(m.createdAt)}</span>
+                </span>
               </div>
               <p className="mt-2 whitespace-pre-line text-sm text-slate-600">{m.body}</p>
             </li>

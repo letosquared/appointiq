@@ -1,3 +1,4 @@
+import type { WebhookEnvelope } from '@appointiq/ghl';
 import type { AutomationRun, OutboxMessage } from './automation';
 import { getSandboxStore } from './ghl';
 import { ghlMode } from './ghl';
@@ -145,6 +146,58 @@ const SAMPLE_OUTBOX: OutboxMessage[] = [
   },
 ];
 
+const event = (e: Pick<WebhookEnvelope, 'type' | 'id' | 'data' | 'createdAt'>): WebhookEnvelope => ({
+  locationId: 'demo-location',
+  delivered: true,
+  deliveryAttempts: 1,
+  ...e,
+});
+
+const SAMPLE_EVENTS: WebhookEnvelope[] = [
+  event({
+    type: 'ContactCreated',
+    id: 'evt-1',
+    data: { contactId: 'c_002' },
+    createdAt: isoAgo(1),
+  }),
+  event({
+    type: 'ContactCustomFieldUpdate',
+    id: 'evt-2',
+    data: { contactId: 'c_002', fields: ['cf_lead_score', 'cf_lead_stage'] },
+    createdAt: isoAgo(1),
+  }),
+  event({
+    type: 'ContactTagAdd',
+    id: 'evt-3',
+    data: { contactId: 'c_002', tags: ['warm-lead'] },
+    createdAt: isoAgo(1),
+  }),
+  event({
+    type: 'ContactCreated',
+    id: 'evt-4',
+    data: { contactId: 'c_001' },
+    createdAt: isoAgo(4),
+  }),
+  event({
+    type: 'ContactTagAdd',
+    id: 'evt-5',
+    data: { contactId: 'c_001', tags: ['hot-lead', 'booked'] },
+    createdAt: isoAgo(4),
+  }),
+  event({
+    type: 'AppointmentBooked',
+    id: 'evt-6',
+    data: { appointmentId: 'app_001', contactId: 'c_001' },
+    createdAt: isoAgo(4),
+  }),
+  event({
+    type: 'AppointmentStatusChanged',
+    id: 'evt-7',
+    data: { appointmentId: 'app_003', status: 'confirmed' },
+    createdAt: isoAgo(50),
+  }),
+];
+
 export async function ensureDemoActivity(): Promise<void> {
   if (ghlMode() !== 'sandbox') return;
   const store = getSandboxStore();
@@ -157,5 +210,10 @@ export async function ensureDemoActivity(): Promise<void> {
   const outbox = (await store.getCollection<OutboxMessage>('outbox')) ?? [];
   if (outbox.length === 0) {
     await store.putCollection('outbox', [...SAMPLE_OUTBOX]);
+  }
+
+  const events = (await store.getCollection<WebhookEnvelope>('events')) ?? [];
+  if (events.length === 0) {
+    await store.putCollection('events', [...SAMPLE_EVENTS]);
   }
 }

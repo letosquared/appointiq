@@ -12,6 +12,8 @@ export interface AutomationRun {
   calendarId?: string;
   appointmentId?: string;
   message?: string;
+  reasons?: string[];
+  reply?: { channel: 'sms' | 'whatsapp' | 'email'; body: string };
   createdAt: string;
 }
 

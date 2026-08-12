@@ -396,6 +396,16 @@ export const customFields: CustomFieldDefinition[] = [
     isRequired: false,
     isUnique: false,
   },
+  {
+    id: 'cf_origin',
+    locationId: LOCATION_ID,
+    name: 'Origin',
+    fieldKey: 'origin',
+    dataType: 'TEXT',
+    model: 'contact',
+    isRequired: false,
+    isUnique: false,
+  },
 ];
 
 const cf = (id: string, value: string | number | boolean | string[] | null) => ({ id, value });

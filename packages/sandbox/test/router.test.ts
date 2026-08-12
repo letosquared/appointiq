@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import { GhlApiError } from '@appointiq/ghl';
 import { MemoryStore } from '../src/store';
 import { SandboxServer } from '../src/router';
+import { SandboxTransport } from '../src/index';
 import type { Contact, WebhookSubscription } from '../src/domain';
 
 const DEMO_NOW = () => new Date('2026-01-05T00:00:00.000Z');
@@ -63,13 +65,23 @@ describe('contacts', () => {
   });
 });
 
+describe('SandboxTransport', () => {
+  it('rejects non-2xx responses with GhlApiError so client guards can catch missing resources', async () => {
+    const { server } = makeServer();
+    const transport = new SandboxTransport(server);
+    await expect(transport.request({ method: 'GET', path: '/contacts/nope' })).rejects.toThrow(GhlApiError);
+    await expect(transport.request({ method: 'GET', path: '/contacts/nope' })).rejects.toThrowError(/Contact not found/);
+  });
+});
+
 describe('custom fields & calendars', () => {
   it('lists custom fields for the contact model', async () => {
     const { server } = makeServer();
     const res = await get(server, '/custom-fields', { model: 'contact' });
     const body = res.body as { customFields: { id: string }[] };
-    expect(body.customFields.length).toBe(9);
+    expect(body.customFields.length).toBe(10);
     expect(body.customFields.map((f) => f.id)).toContain('cf_lead_score');
+    expect(body.customFields.map((f) => f.id)).toContain('cf_origin');
   });
 
   it('lists calendars and returns free slots', async () => {

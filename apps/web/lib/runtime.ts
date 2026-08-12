@@ -25,7 +25,12 @@ async function bootstrap(): Promise<void> {
   // Backfill sample runs/outbox so the demo never opens to empty panels.
   await ensureDemoActivity();
 
-  const publicUrl = process.env.PUBLIC_BASE_URL;
+  // Vercel sets VERCEL_URL automatically, so the app can subscribe its own
+  // webhook receiver even without PUBLIC_BASE_URL. PUBLIC_BASE_URL still wins
+  // when set (e.g. a custom domain).
+  const publicUrl =
+    process.env.PUBLIC_BASE_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
   if (!publicUrl) return;
 
   const subs = await client.transport.request({ method: 'GET', path: '/webhooks' });

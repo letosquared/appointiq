@@ -95,3 +95,24 @@ Every capability worth telling the Conek team about, in order.
   empty and is sandbox-only, so real simulations always win; "Reset demo"
   wipes smoke-test cruft and re-seeds the sample activity.
 - Landing feed rows now show `TierBadge` + score.
+
+## 15. Webhook-driven pipeline + dashboard depth
+- The GHL webhook receiver (`/api/webhooks/ghl`) now runs the full lead
+  pipeline on `ContactCreated` — score → stage → follow-up → draft reply —
+  so a real inbound contact (n8n, live API, form) is qualified end-to-end
+  from the webhook alone. Contacts created by the demo simulator are tagged
+  `origin=demo-api` and skipped (that route already ran the pipeline).
+- Self-subscription: the app subscribes its own receiver to the sandbox using
+  `PUBLIC_BASE_URL` or Vercel's `VERCEL_URL` (no env required), so the sandbox
+  emitter performs real signed deliveries to the app and the webhook outbox
+  shows genuine delivery attempts.
+- Webhook outbox/event log: demo backfill now seeds sample webhook events
+  (delivered), so the Webhooks tab is populated on a fresh demo.
+- Sandbox transport parity: `SandboxTransport` now throws `GhlApiError` on
+  non-2xx exactly like the live HTTP transport. Previously a 404 came back as
+  a truthy error object, so `contacts.get('missing-id')` scored a fake contact
+  and produced a bogus run. Fixed with a contract test.
+- Outbox actions: approve/retry per message (or approve all); sending handles
+  both queued and failed states.
+- Dashboard: run cards show engine `reasons` chips and the drafted reply body;
+  webhook events shown per delivery.

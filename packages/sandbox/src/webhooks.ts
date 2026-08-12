@@ -70,11 +70,10 @@ export class WebhookEmitter {
 
   private async deliver(event: WebhookEnvelope, subscription: WebhookSubscription): Promise<void> {
     // Sign over the exact body bytes that hit the wire — the same scheme real
-    // HighLevel uses, so the app's receiver verifies with the raw request text.
-    const payload = { ...event };
-    const body = JSON.stringify(payload);
+    // HighLevel uses. The signature travels in the header, never in the body,
+    // so the app's receiver can verify against the raw request text.
+    const body = JSON.stringify({ ...event });
     const signature = signWebhook(body, this.opts.secret);
-    const wire = JSON.stringify({ ...payload, signature });
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         const res = await this.fetchImpl(subscription.url, {
@@ -84,7 +83,7 @@ export class WebhookEmitter {
             'X-GHL-Signature': signature,
             'User-Agent': 'AppointIQ-Sandbox/0.1',
           },
-          body: wire,
+          body,
         });
         event.delivered = res.ok;
         event.deliveryAttempts = attempt;

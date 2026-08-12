@@ -52,6 +52,10 @@ export async function POST(req: Request) {
       { key: 'lead_source', value: source },
       { key: 'insurance_provider', value: insurance || null },
       { key: 'whatsapp', value: phone },
+      // Marks the contact as created by the demo simulator so the webhook
+      // receiver skips it — this route already runs the pipeline with the
+      // full inbound message.
+      { key: 'origin', value: 'demo-api' },
     ],
   });
 

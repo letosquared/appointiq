@@ -1,4 +1,5 @@
 import type { HttpResponse, HttpRequestOptions, Transport } from '@appointiq/ghl';
+import { GhlApiError } from '@appointiq/ghl';
 import { SandboxServer, type SandboxServerOptions } from './router';
 import { createStore, type Store } from './store';
 import { seedIfEmpty } from './seed';
@@ -39,8 +40,27 @@ export class SandboxTransport implements Transport {
       body: opts.body,
       headers: opts.headers as Record<string, string>,
     });
+    if (res.status < 200 || res.status >= 300) {
+      throw new GhlApiError(
+        describeSandboxError(res.body, res.status, opts.path),
+        res.status,
+        undefined,
+        opts.path,
+        res.body,
+      );
+    }
     return { status: res.status, body: res.body };
   }
+}
+
+function describeSandboxError(body: unknown, status: number, path?: string): string {
+  if (typeof body === 'string') return body;
+  if (body && typeof body === 'object') {
+    const b = body as Record<string, unknown>;
+    const msg = b.message ?? b.error ?? b.detail;
+    if (msg) return String(msg);
+  }
+  return `HTTP ${status} on ${path ?? 'unknown path'}`;
 }
 
 /** Ensure demo data exists, e.g. after a fresh Upstash store. */
