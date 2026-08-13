@@ -189,7 +189,7 @@ export default function DashboardPage() {
                 {tab === 'pipeline' && <PipelineTab data={data} />}
                 {tab === 'calendar' && <CalendarTab data={data} />}
                 {tab === 'automation' && <AutomationTab data={data} />}
-                {tab === 'outbox' && <OutboxTab data={data} />}
+                {tab === 'outbox' && <OutboxTab data={data} onRefresh={refresh} />}
                 {tab === 'webhooks' && <WebhooksTab data={data} />}
               </>
             )}

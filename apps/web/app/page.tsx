@@ -161,15 +161,35 @@ export default async function LandingPage() {
           ) : (
             <ul className="divide-y divide-slate-100">
               {recentRuns.map((r) => (
-                <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <span className="font-medium text-slate-800">{r.contactName}</span>
-                    <Badge tone={r.type === 'booked' ? 'green' : 'blue'}>{r.type}</Badge>
-                    {r.score !== undefined && <TierBadge tier={r.tier} />}
-                    {r.score !== undefined && <Badge tone="green">score {r.score}</Badge>}
-                    <span className="truncate text-slate-500">{r.message}</span>
+                <li key={r.id} className="px-5 py-3 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <span className="font-medium text-slate-800">{r.contactName}</span>
+                      <Badge tone={r.type === 'booked' ? 'green' : 'blue'}>{r.type}</Badge>
+                      {r.score !== undefined && <TierBadge tier={r.tier} />}
+                      {r.score !== undefined && <Badge tone="green">score {r.score}</Badge>}
+                      <span className="truncate text-slate-500">{r.message}</span>
+                    </div>
+                    <span className="shrink-0 text-xs text-slate-400">{new Date(r.createdAt).toLocaleString()}</span>
                   </div>
-                  <span className="shrink-0 text-xs text-slate-400">{new Date(r.createdAt).toLocaleString()}</span>
+                  {r.reasons && r.reasons.length > 0 && (
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Why</span>
+                      {r.reasons.map((reason, i) => (
+                        <span key={i} className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
+                          {reason}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {r.reply && (
+                    <div className="mt-2 flex items-start gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2">
+                      <Badge tone={r.reply.channel === 'whatsapp' ? 'green' : r.reply.channel === 'email' ? 'blue' : 'amber'}>
+                        {r.reply.channel}
+                      </Badge>
+                      <p className="whitespace-pre-line text-xs leading-relaxed text-slate-600">{r.reply.body}</p>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

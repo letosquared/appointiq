@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Badge, Panel, StatCard, TierBadge } from '@/components/ui';
 import type { DashboardData } from './types';
 
@@ -228,8 +227,7 @@ export function AutomationTab({ data }: { data: DashboardData }) {
   );
 }
 
-export function OutboxTab({ data }: { data: DashboardData }) {
-  const router = useRouter();
+export function OutboxTab({ data, onRefresh }: { data: DashboardData; onRefresh: () => Promise<void> }) {
   const [sending, setSending] = useState(false);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const chanTone = (c: string) => (c === 'whatsapp' ? 'green' : c === 'email' ? 'blue' : 'amber');
@@ -239,12 +237,12 @@ export function OutboxTab({ data }: { data: DashboardData }) {
   const sendOne = async (id: string) => {
     setSendingId(id);
     try {
-      await fetch('/api/outbox/send', {
+      const res = await fetch('/api/outbox/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: [id] }),
       });
-      router.refresh();
+      if (res.ok) await onRefresh();
     } finally {
       setSendingId(null);
     }
@@ -253,8 +251,8 @@ export function OutboxTab({ data }: { data: DashboardData }) {
   const approveAll = async () => {
     setSending(true);
     try {
-      await fetch('/api/outbox/send', { method: 'POST' });
-      router.refresh();
+      const res = await fetch('/api/outbox/send', { method: 'POST' });
+      if (res.ok) await onRefresh();
     } finally {
       setSending(false);
     }
