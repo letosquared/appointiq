@@ -57,7 +57,9 @@ const STAFF: StaffAccount[] = [
 export function loginStaff(username: string, password: string): StaffUser | null {
   const account = STAFF.find((a) => a.username === username.trim().toLowerCase());
   if (!account) return null;
-  const candidate = createHash('sha256').update(password).digest();
+  // Trim so an accidental leading/trailing space on the known demo password
+  // doesn't silently fail the login.
+  const candidate = createHash('sha256').update(password.trim()).digest();
   const expected = Buffer.from(account.passwordHash, 'hex');
   if (!timingSafeEqual(candidate, expected)) return null;
   return { username: account.username, name: account.name, role: account.role };
