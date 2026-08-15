@@ -51,7 +51,7 @@ The client is chosen in `apps/web/lib/ghl.ts` from `GHL_MODE`:
 | `GHL_MODE` | `sandbox` (default) or `live` | which transport the client uses |
 | `GHL_API_KEY` | your private integration key | required when `live` |
 | `GHL_LOCATION_ID` | the Mercy Medical sub-account location id | scopes contacts/calendars |
-| `PUBLIC_BASE_URL` | `https://appointiq.vercel.app` | for webhook subscription + cron |
+| `PUBLIC_BASE_URL` | `https://appointiq-webp.vercel.app` | for webhook subscription |
 | `WEBHOOK_SECRET` | a long random string | shared with n8n (`X-API-Secret`) |
 | `SANDBOX_STORE` | `file` / `upstash` / `memory` | demo vs multi-instance |
 
@@ -78,7 +78,7 @@ GHL looks fields up by their id string.
 In GHL **Settings → Webhooks** subscribe to:
 
 - `ContactCreated` → n8n webhook (`/webhook/ghl-lead`) or directly to
-  `https://appointiq.vercel.app/api/webhooks/ghl`
+  `https://appointiq-webp.vercel.app/api/webhooks/ghl`
 - `AppointmentStatusChanged` → n8n (`/webhook/ghl-appointment`) or the same
   app URL (the no-show rebooking flow listens for `no-show`).
 

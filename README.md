@@ -93,7 +93,7 @@ Production build and quality gates:
 
 ```bash
 npm run check     # typecheck across all workspaces + web app
-npm test          # 33 unit tests (engine, ghl SDK, sandbox)
+npm test          # 34 unit tests (engine, ghl SDK, sandbox)
 npm run build     # production build
 ```
 

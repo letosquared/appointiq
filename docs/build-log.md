@@ -82,8 +82,9 @@ Every capability worth telling the Conek team about, in order.
 ## Test status
 - `packages/engine`: 13 unit tests (scoring incl. safety overrides, routing
   windows, replies).
-- `packages/sandbox`: GHL-contract tests (contacts, slots, appointments, tags).
-- `apps/web`: typecheck via `tsc --noEmit`; production build green. Total: 33.
+- `packages/sandbox`: GHL-contract tests (contacts, slots, appointments, tags,
+  transport).
+- `apps/web`: typecheck via `tsc --noEmit`; production build green. Total: 34.
 
 ## 14. Demo backfill (Loom readiness)
 - `apps/web/lib/demo-activity.ts` seeds realistic sample `runs` and outbox

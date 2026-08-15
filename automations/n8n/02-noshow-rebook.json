@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "url": "https://appointiq.vercel.app/api/automations/rebook",
+        "url": "https://appointiq-webp.vercel.app/api/automations/rebook",
         "method": "POST",
         "sendHeaders": true,
         "headerParameters": {

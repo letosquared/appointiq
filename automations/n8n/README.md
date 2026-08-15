@@ -16,7 +16,7 @@ Vercel Cron, or a click in the demo.
 1. **Environment variables** in n8n (Settings → Variables, or `N8N_ENV_VARS`):
    - `WEBHOOK_SECRET` — same value as the app's `WEBHOOK_SECRET` (used as the
      `X-API-Secret` header so n8n can call Vercel).
-   - `PUBLIC_BASE_URL` — your app URL, e.g. `https://appointiq.vercel.app`.
+   - `PUBLIC_BASE_URL` — your app URL, e.g. `https://appointiq-webp.vercel.app`.
 2. **Import** — n8n UI → Workflows → "Import from file" → pick each JSON.
    Or CLI: `n8n import:workflow --file=automations/n8n/01-lead-intake-score-route.json`.
 3. **Point GHL at n8n** — in GoHighLevel, add two webhook subscriptions under

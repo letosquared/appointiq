@@ -160,7 +160,7 @@ export default function DashboardPage() {
                 <li>The engine scores it, drafts a WhatsApp reply, picks a doctor.</li>
                 <li>Booking intent auto-books the next free slot.</li>
                 <li>Every step lands in Automation, Outbox and Webhooks tabs.</li>
-                <li>n8n + Vercel Cron handle the long game (nurture, rebook, digest).</li>
+                <li>n8n handles the long game (nurture, rebook, digest).</li>
               </ol>
             </div>
           </div>

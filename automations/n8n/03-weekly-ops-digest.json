@@ -14,7 +14,7 @@
     },
     {
       "parameters": {
-        "url": "https://appointiq.vercel.app/api/dashboard",
+        "url": "https://appointiq-webp.vercel.app/api/dashboard",
         "method": "GET",
         "options": {}
       },

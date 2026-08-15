@@ -16,7 +16,7 @@
     },
     {
       "parameters": {
-        "url": "https://appointiq.vercel.app/api/automations/qualify",
+        "url": "https://appointiq-webp.vercel.app/api/automations/qualify",
         "method": "POST",
         "sendHeaders": true,
         "headerParameters": {
@@ -54,7 +54,7 @@
     },
     {
       "parameters": {
-        "url": "https://appointiq.vercel.app/api/outbox",
+        "url": "https://appointiq-webp.vercel.app/api/outbox",
         "method": "GET",
         "options": {}
       },
