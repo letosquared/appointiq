@@ -86,7 +86,9 @@ Complete a booking with a name and WhatsApp number, hit confirm.
 
 ## 140–210s — The ops dashboard: the receipt
 
-Open `/dashboard`, enter passcode `mercy`. Walk the tabs:
+Open `/dashboard` and sign in as a staff member (username `w.ngugi`, password
+`mercy` — the front desk account). The header shows **Logged in as Wanjiru
+Ngugi · Front Desk**. Walk the tabs:
 
 1. **Overview** — the revenue estimate (KES 223k in qualified pipeline),
    pipeline stats, recent automation runs.
@@ -193,9 +195,10 @@ Split-screen or quick cuts, brief but visible:
 2. Qualifier: *Urgent — bleeding in pregnancy* → hot + auto-book + reply; then
    flip to *Cold — price list* for contrast
 3. `/book` → pick service + doctor → real slot → confirm as a patient
-4. `/dashboard` (passcode `mercy`) → Overview (KES 223k + runs w/ reasons) →
-   Outbox (*queued* → *Approve & send* → *sent*) → Calendar (shows our booking)
-   → Webhooks (delivered events)
+4. `/dashboard` → staff sign in (`w.ngugi` / `mercy`, **Logged in as Wanjiru
+   Ngugi**) → Overview (KES 223k + runs w/ reasons) → Outbox (*queued* →
+   *Approve & send* → *sent*) → Calendar (shows our booking) → Webhooks
+   (delivered events)
 5. Repo: `packages/ghl` + `packages/sandbox` (SDK/transport flip)
 6. Repo: `automations/n8n/` (three workflows)
 7. Repo: `.github/workflows/ci.yml` + commit history

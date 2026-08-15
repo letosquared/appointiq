@@ -5,7 +5,7 @@ import Link from 'next/link';
 import SimulateLead from '@/components/dashboard/SimulateLead';
 import { AutomationTab, CalendarTab, OutboxTab, OverviewTab, PipelineTab, WebhooksTab } from '@/components/dashboard/tabs';
 import type { AutomationRun, DashboardData } from '@/components/dashboard/types';
-import { Badge, BrandWordmark } from '@/components/ui';
+import { Badge, BrandWordmark, Logo } from '@/components/ui';
 
 type Tab = 'overview' | 'pipeline' | 'calendar' | 'automation' | 'outbox' | 'webhooks';
 
@@ -20,7 +20,9 @@ const TABS: { id: Tab; label: string }[] = [
 
 export default function DashboardPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
-  const [passcode, setPasscode] = useState('');
+  const [user, setUser] = useState<{ username: string; name: string; role: string } | null>(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [data, setData] = useState<DashboardData | null>(null);
   const [tab, setTab] = useState<Tab>('overview');
@@ -37,7 +39,10 @@ export default function DashboardPage() {
       .then((r) => r.json())
       .then((d) => {
         setAuthed(!!d.authed);
-        if (d.authed) void refresh();
+        if (d.authed) {
+          setUser(d.user ?? null);
+          void refresh();
+        }
       });
   }, [refresh]);
 
@@ -45,15 +50,26 @@ export default function DashboardPage() {
     const res = await fetch('/api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passcode }),
+      body: JSON.stringify({ username, password }),
     });
+    const data = await res.json();
     if (res.ok) {
       setAuthed(true);
+      setUser(data.user ?? null);
       setLoginError('');
       void refresh();
     } else {
-      setLoginError('Wrong passcode. Hint: try “mercy”.');
+      setLoginError('Wrong username or password.');
     }
+  }
+
+  async function logout() {
+    await fetch('/api/auth', { method: 'DELETE' });
+    setAuthed(false);
+    setUser(null);
+    setData(null);
+    setUsername('');
+    setPassword('');
   }
 
   async function reset() {
@@ -84,27 +100,43 @@ export default function DashboardPage() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6">
         <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-clinic-600 font-bold text-white">A</div>
-          <h1 className="mt-4 text-xl font-bold text-ink-800">Ops dashboard</h1>
-          <p className="mt-1 text-sm text-slate-500">Enter the demo passcode to continue.</p>
+          <div className="flex items-center gap-3">
+            <Logo />
+            <div>
+              <p className="text-base font-bold text-ink-800">Mercy Medical Centre</p>
+              <p className="text-xs text-slate-500">Ops dashboard · staff sign in</p>
+            </div>
+          </div>
           <form
-            className="mt-6"
+            className="mt-6 space-y-3"
             onSubmit={(e) => {
               e.preventDefault();
               void login();
             }}
           >
             <input
-              type="password"
-              value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
-              placeholder="Passcode"
+              type="text"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-clinic-500 focus:outline-none focus:ring-1 focus:ring-clinic-500"
             />
-            {loginError && <p className="mt-2 text-sm text-red-600">{loginError}</p>}
-            <button type="submit" className="mt-4 w-full rounded-lg bg-clinic-600 px-4 py-2.5 font-semibold text-white hover:bg-clinic-700">
-              Unlock
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-clinic-500 focus:outline-none focus:ring-1 focus:ring-clinic-500"
+            />
+            {loginError && <p className="text-sm text-red-600">{loginError}</p>}
+            <button type="submit" className="w-full rounded-lg bg-clinic-600 px-4 py-2.5 font-semibold text-white hover:bg-clinic-700">
+              Sign in
             </button>
+            <p className="pt-1 text-center text-xs text-slate-400">
+              Demo: w.ngugi / mercy · front desk
+            </p>
           </form>
         </div>
       </main>
@@ -124,6 +156,17 @@ export default function DashboardPage() {
             <Link href="/" className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
               Patient site
             </Link>
+            {user && (
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5">
+                <span className="text-xs font-medium text-slate-700">
+                  Logged in as <span className="font-semibold text-ink-800">{user.name}</span>
+                  <span className="text-slate-500"> · {user.role}</span>
+                </span>
+                <button onClick={() => void logout()} className="text-xs font-medium text-clinic-600 hover:text-clinic-700">
+                  Sign out
+                </button>
+              </div>
+            )}
             <button
               onClick={() => void reset()}
               disabled={resetting}

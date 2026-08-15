@@ -117,3 +117,14 @@ Every capability worth telling the Conek team about, in order.
   both queued and failed states.
 - Dashboard: run cards show engine `reasons` chips and the drafted reply body;
   webhook events shown per delivery.
+
+## 16. Staff sign-in (dashboard auth)
+- The ops dashboard now requires a staff login instead of a bare passcode:
+  seeded staff directory (e.g. `w.ngugi` front desk, `a.odhiambo` practice
+  manager, `d.mwangi` lead clinician) with hashed passwords and role display.
+- Signing in sets a signed browser-session cookie (no `maxAge`), so staff log
+  in again on each visit; the header shows **Logged in as {name} · {role}**
+  with a sign-out button. Tokens embed the username base64url-encoded and are
+  verified constant-time against the directory.
+- The sign-in card uses the clinic logo (`/mercy-logo.png`) via the shared
+  `Logo` component instead of a placeholder icon.

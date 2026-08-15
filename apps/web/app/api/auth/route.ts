@@ -1,26 +1,27 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { passcodeOk, sessionToken, verifySession, SESSION_COOKIE } from '@/lib/auth';
+import { loginStaff, sessionToken, verifySession, SESSION_COOKIE } from '@/lib/auth';
 
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => ({}))) as { passcode?: string };
-  if (!body.passcode || !passcodeOk(body.passcode)) {
-    return NextResponse.json({ ok: false, message: 'Wrong passcode' }, { status: 401 });
+  const body = (await req.json().catch(() => ({}))) as { username?: string; password?: string };
+  const user = loginStaff(body.username ?? '', body.password ?? '');
+  if (!user) {
+    return NextResponse.json({ ok: false, message: 'Wrong username or password' }, { status: 401 });
   }
   const store = await cookies();
-  store.set(SESSION_COOKIE, sessionToken(), {
+  store.set(SESSION_COOKIE, sessionToken(user), {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: 7 * 86400,
+    // Browser-session cookie: no maxAge, so staff sign in again on each visit.
   });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, user });
 }
 
 export async function GET() {
   const store = await cookies();
-  const authed = verifySession(store.get(SESSION_COOKIE)?.value);
-  return NextResponse.json({ authed });
+  const session = verifySession(store.get(SESSION_COOKIE)?.value);
+  return NextResponse.json({ authed: session.ok, user: session.user });
 }
 
 export async function DELETE() {
