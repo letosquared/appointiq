@@ -27,6 +27,11 @@ function hash(secret: string): string {
   return createHash('sha256').update(secret).digest('hex');
 }
 
+/** Constant-time string comparison (sha256 pre-hash so length is not leaked). */
+export function safeEqual(a: string, b: string): boolean {
+  return timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest());
+}
+
 /** Seeded staff directory for the Mercy demo. */
 const STAFF: StaffAccount[] = [
   {
@@ -70,7 +75,7 @@ export function verifySession(cookie: string | null | undefined): { ok: boolean;
   if (!cookie) return { ok: false, user: null };
   const parts = cookie.split('.');
   if (parts.length !== 3) return { ok: false, user: null };
-  const [expStr, usernameB64, sig] = parts;
+  const [expStr = '', usernameB64 = '', sig = ''] = parts;
   const exp = Number(expStr);
   if (!Number.isFinite(exp) || exp < Date.now()) return { ok: false, user: null };
   let username: string;
